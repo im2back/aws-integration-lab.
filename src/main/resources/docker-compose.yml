@@ -1,0 +1,15 @@
+services:
+  localstack:
+    image: localstack/localstack:2026.10.3
+    container_name: aws-integration-lab-localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - SERVICES=s3,iam,sts
+      - AWS_DEFAULT_REGION=sa-east-1
+      - LOCALSTACK_AUTH_TOKEN=ls-BILU4624-WUmu-5933-giYI-RACEDILEef68
+    volumes:
+      - localstack-data:/var/lib/localstack
+
+volumes:
+  localstack-data:
