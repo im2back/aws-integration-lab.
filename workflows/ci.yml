@@ -1,0 +1,69 @@
+
+# Nome da pipeline exibido na aba Actions do GitHub
+name: CI - AWS Integration Lab
+
+# Eventos que disparam automaticamente a pipeline
+on:
+  # Executa quando um commit é enviado ao GitHub (git push)
+  push:
+
+  # Executa quando um Pull Request é aberto ou atualizado
+  pull_request:
+
+# Conjunto de trabalhos executados pela pipeline
+jobs:
+
+  # Identificador interno do Job
+  tests:
+
+    # Nome do Job exibido na interface do GitHub Actions
+    name: Unit and Integration Tests
+
+    # Solicita ao GitHub uma máquina virtual Linux (Ubuntu)
+    # temporária para executar este Job
+    runs-on: ubuntu-latest
+
+    # Etapas executadas sequencialmente dentro do Job
+    steps:
+
+      # STEP 1 - Baixar o código-fonte do repositório GitHub
+      - name: Checkout repository
+
+        # Action oficial que disponibiliza os arquivos
+        # do repositório dentro da máquina virtual
+        uses: actions/checkout@v4
+
+      # STEP 2 - Configurar o ambiente Java
+      - name: Set up Java 17
+
+        # Action oficial para instalar/configurar o JDK
+        uses: actions/setup-java@v4
+
+        # Parâmetros fornecidos para a Action
+        with:
+
+          # Distribuição do JDK: Eclipse Temurin
+          distribution: temurin
+
+          # Versão do Java utilizada no build
+          java-version: '17'
+
+          # Habilita o cache das dependências Maven
+          # para acelerar execuções futuras
+          cache: maven
+
+      # STEP 3 - Compilar e executar os testes
+      - name: Run unit and integration tests
+
+        # Variáveis de ambiente disponíveis neste Step
+        env:
+
+          # Recupera o token dos Secrets do GitHub
+          # e disponibiliza ao processo Maven/Testcontainers
+          LOCALSTACK_AUTH_TOKEN: ${{ secrets.LOCALSTACK_AUTH_TOKEN }}
+
+        # Executa o comando Maven no terminal do runner
+        # clean: remove os artefatos de builds anteriores
+        # verify: executa o ciclo Maven até a fase de verificação
+        # --batch-mode: evita interações no terminal
+        run: mvn --batch-mode clean verify

@@ -47,6 +47,7 @@ class S3UploadIntegrationTest {
     @Autowired
     private MockMvc mvc;
 
+    //Dependência utilizada na assertiva
     @Autowired
     private S3Client s3Client;
 
@@ -55,7 +56,6 @@ class S3UploadIntegrationTest {
     
     private static final String ENDPOINT = "/api/v1/s3/files";
     
-
 	@Container
 	static LocalStackContainer localstack = new LocalStackContainer(
 	        DockerImageName.parse("localstack/localstack:2026.10.3")
@@ -73,8 +73,6 @@ class S3UploadIntegrationTest {
 	                )
 	        );
 	
-	    
-   
 	@DynamicPropertySource
 	static void configureProperties(DynamicPropertyRegistry registry) {
 	
