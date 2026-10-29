@@ -103,13 +103,59 @@
 	</dependencyManagement>
 
 	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-		
-		</plugins>
+	    <plugins>
+	
+	        <!-- Plugin responsável pelo empacotamento do Spring Boot -->
+	        <plugin>
+	            <groupId>org.springframework.boot</groupId>
+	            <artifactId>spring-boot-maven-plugin</artifactId>
+	        </plugin>
+	
+	        <!-- Plugin responsável pela cobertura de testes -->
+	        <plugin>
+	            <groupId>org.jacoco</groupId>
+	            <artifactId>jacoco-maven-plugin</artifactId>
+	            <version>0.8.16</version>
+				 <!-- Classes e pacotes que não entrarão no relatório de cobertura -->
+			    <configuration>
+			        <excludes>
+			            <!-- Exclui todos os Mappers -->
+			            <exclude>**/controller/mapper/**</exclude>
+			
+			            <!-- Exclui todos os DTOs -->
+			            <exclude>**/controller/dto/**</exclude>
+			
+			            <!-- Exclui somente a classe principal do Spring Boot -->
+			            
+			            <exclude>**/AwsIntegrationLabApplication.class</exclude>
+			            <!-- Exclui a classe de configuração do S3 -->
+						<exclude>**/S3Config.class</exclude>
+			        </excludes>
+			    </configuration>
+
+	            <executions>
+	
+	                <!-- Prepara o agente de cobertura antes dos testes -->
+	                <execution>
+	                    <id>prepare-agent</id>
+	                    <goals>
+	                        <goal>prepare-agent</goal>
+	                    </goals>
+	                </execution>
+	
+	                <!-- Gera os relatórios após a execução dos testes -->
+	                <execution>
+	                    <id>generate-report</id>
+	                    <phase>verify</phase>
+	                    <goals>
+	                        <goal>report</goal>
+	                    </goals>
+	                </execution>
+	
+	            </executions>
+	        </plugin>
+	
+	    </plugins>
 	</build>
 
 </project>
