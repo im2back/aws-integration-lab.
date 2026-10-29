@@ -8,6 +8,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.github.im2back.aws_integration_lab.controller.dto.out.S3UploadResponse;
+import com.github.im2back.aws_integration_lab.controller.mapper.out.S3RestMapper;
+
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
@@ -54,7 +57,7 @@ public class S3Service {
      * @throws IllegalArgumentException se o arquivo estiver vazio.
      * @throws IllegalStateException se ocorrer uma falha na leitura do arquivo.
      */
-    public String upload(MultipartFile file) {
+    public S3UploadResponse upload(MultipartFile file) {
 
         if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("O arquivo não pode estar vazio.");
@@ -78,8 +81,12 @@ public class S3Service {
                 .build();
 
         try {
-            s3Client.putObject(request, RequestBody.fromInputStream(file.getInputStream(), file.getSize()));
-            return objectKey;
+        	s3Client.putObject(
+        	        request	,
+        	        RequestBody.fromInputStream(file.getInputStream(), file.getSize())
+        	);
+
+        	return S3RestMapper.toUploadResponse(request);
         } catch (IOException e) {
             throw new IllegalStateException("Erro ao ler o arquivo para upload.", e);
         }
