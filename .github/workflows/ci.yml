@@ -17,7 +17,7 @@ jobs:
   tests:
 
     # Nome do Job exibido na interface do GitHub Actions
-    name: Unit and Integration Tests
+    name: Unit, Integration Tests and Code Quality
 
     # Solicita ao GitHub uma máquina virtual Linux (Ubuntu)
     # temporária para executar este Job
@@ -32,6 +32,14 @@ jobs:
         # Action oficial que disponibiliza os arquivos
         # do repositório dentro da máquina virtual
         uses: actions/checkout@v4
+
+        # Parâmetros fornecidos para a Action
+        with:
+
+          # Baixa o histórico completo do Git.
+          # Recomendado para o SonarScanner identificar corretamente
+          # alterações no código, autoria e histórico das branches.
+          fetch-depth: 0
 
       # STEP 2 - Configurar o ambiente Java
       - name: Set up Java 17
@@ -52,7 +60,7 @@ jobs:
           # para acelerar execuções futuras
           cache: maven
 
-      # STEP 3 - Compilar e executar os testes
+      # STEP 3 - Compilar, executar os testes e gerar a cobertura
       - name: Run unit and integration tests
 
         # Variáveis de ambiente disponíveis neste Step
@@ -66,4 +74,36 @@ jobs:
         # clean: remove os artefatos de builds anteriores
         # verify: executa o ciclo Maven até a fase de verificação
         # --batch-mode: evita interações no terminal
+        #
+        # O JUnit executa os testes unitários e de integração.
+        # O Testcontainers inicializa o LocalStack automaticamente.
+        # O JaCoCo coleta a cobertura dos testes e gera o relatório:
+        # target/site/jacoco/jacoco.xml
         run: mvn --batch-mode clean verify
+
+      # STEP 4 - Analisar a qualidade do código com SonarQube Cloud
+      - name: Analyze code with SonarQube Cloud
+
+        # Variáveis de ambiente disponíveis neste Step
+        env:
+
+          # Recupera o token de autenticação dos Secrets do GitHub.
+          # O SonarScanner utiliza esse token para enviar a análise
+          # ao projeto cadastrado no SonarQube Cloud.
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+
+        # Executa o SonarScanner for Maven.
+        #
+        # O scanner utiliza as propriedades definidas no pom.xml:
+        # sonar.projectKey
+        # sonar.organization
+        # sonar.host.url
+        # sonar.coverage.jacoco.xmlReportPaths
+        #
+        # Ele realiza a análise estática e importa o relatório XML
+        # do JaCoCo gerado anteriormente pelo STEP 3.
+        #
+        # Os resultados são enviados ao SonarQube Cloud,
+        # onde podemos consultar bugs potenciais, vulnerabilidades,
+        # problemas de manutenção, duplicações e cobertura.
+        run: mvn --batch-mode org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
