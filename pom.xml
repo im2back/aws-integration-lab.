@@ -43,6 +43,14 @@
 		<!-- Relatório XML de cobertura gerado pelo JaCoCo -->
 		<sonar.coverage.jacoco.xmlReportPaths>target/site/jacoco/jacoco.xml</sonar.coverage.jacoco.xmlReportPaths>
 		
+		<!-- Exclui arquivos específicos do cálculo de cobertura no SonarQube -->
+		<sonar.coverage.exclusions>
+		    **/AwsIntegrationLabApplication.java,
+		    **/config/**,
+		    **/controller/mapper/**,
+		    **/controller/dto/**
+		</sonar.coverage.exclusions>
+
 	</properties>
 	<dependencies>
 		<dependency>
@@ -166,7 +174,39 @@
 	                        <goal>report</goal>
 	                    </goals>
 	                </execution>
-	
+					<!-- STEP 3 - Verifica se a cobertura geral atingiu pelo menos 80% -->
+					<execution>
+					    <id>check-coverage</id>
+					
+					    <!-- Executa a verificação na fase verify do Maven -->
+					    <phase>verify</phase>
+					
+					    <goals>
+					        <goal>check</goal>
+					    </goals>
+					
+					    <configuration>
+					        <rules>
+					            <rule>
+					                <!-- Avalia a cobertura do projeto como um todo -->
+					                <element>BUNDLE</element>
+					
+					                <limits>
+					                    <limit>
+					                        <!-- Mede a cobertura de linhas -->
+					                        <counter>LINE</counter>
+					
+					                        <!-- Considera a proporção de linhas cobertas -->
+					                        <value>COVEREDRATIO</value>
+					
+					                        <!-- Exige no mínimo 80% -->
+					                        <minimum>0.80</minimum>
+					                    </limit>
+					                </limits>
+					            </rule>
+					        </rules>
+					    </configuration>
+					</execution>	
 	            </executions>
 	        </plugin>
 	

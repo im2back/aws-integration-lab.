@@ -106,4 +106,4 @@ jobs:
         # Os resultados são enviados ao SonarQube Cloud,
         # onde podemos consultar bugs potenciais, vulnerabilidades,
         # problemas de manutenção, duplicações e cobertura.
-        run: mvn --batch-mode org.sonarsource.scanner.maven:sonar-maven-plugin:sonar
+        run: mvn --batch-mode org.sonarsource.scanner.maven:sonar-maven-plugin:sonar -Dsonar.qualitygate.wait=true -Dsonar.qualitygate.timeout=300
